@@ -1,5 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+
+
+login_manager = LoginManager()
 
 # Create an instance of SQLAlchemy
 db = SQLAlchemy()
@@ -24,11 +28,24 @@ def create_app():
     # Connect the database to the app
     db.init_app(app)
 
+ # Set the login view for Flask-Login
+    login_manager.login_view = 'main.login'  # Define where to redirect for login
+    login_manager.init_app(app)  # Initialize with the app
+
     # Import and register models
     with app.app_context():
-        from .models import product  # Import product model
+        from .models import Product  # Import product model
+        from .models import Order # Import order model
+        from .models import User # Import user model
+        from .models import OrderProduct # Import orderproduct model
         db.create_all()  # Create all database tables
-
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Load a user from the database using the user ID."""
+        from .models.user import User
+        return User.query.get(int(user_id))
+    
     # Import and register the Blueprints
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
