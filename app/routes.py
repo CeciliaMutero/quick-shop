@@ -1,5 +1,9 @@
-from app import app
-@app.route('/')
+from flask import Blueprint
+
+# Define a Blueprint
+main = Blueprint('main', __name__)
+
+# Define routes using the Blueprint
+@main.route('/')
 def home():
-    """Route for the homepage that returns a welcome message."""
-    return "Hello, Flask!"
+    return "Hello, World!"
