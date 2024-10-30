@@ -1,6 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+import os
 
 
 login_manager = LoginManager()
@@ -22,6 +25,7 @@ def create_app():
     app = Flask(__name__)
 
     # Configure the location of the quickshop database
+    app.config['SECRET_KEY'] = os.urandom(24)  # Generates a random secret key for security
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Shish1993%24@localhost/quickshop'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -32,12 +36,13 @@ def create_app():
     login_manager.login_view = 'main.login'  # Define where to redirect for login
     login_manager.init_app(app)  # Initialize with the app
 
+
     # Import and register models
     with app.app_context():
-        from .models import Product  # Import product model
-        from .models import Order # Import order model
-        from .models import User # Import user model
-        from .models import OrderProduct # Import orderproduct model
+        from app.models.product import Product  # Import product model
+        from app.models.order import Order # Import order model
+        from app.models.user import User # Import user model
+        from app.models.orderproduct import OrderProduct # Import orderproduct model
         db.create_all()  # Create all database tables
     
     @login_manager.user_loader
@@ -45,6 +50,10 @@ def create_app():
         """Load a user from the database using the user ID."""
         from .models.user import User
         return User.query.get(int(user_id))
+    
+    # Initialize Flask-Admin
+    admin = Admin(app, name='Admin Panel', template_mode='bootstrap3')
+    admin.add_view(ModelView(Product, db.session))  # Add Product model to admin
     
     # Import and register the Blueprints
     from .routes import main as main_blueprint

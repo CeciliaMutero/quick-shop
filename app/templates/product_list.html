@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Listing</title>
+</head>
+<body>
+    <h1>Products</h1>
+
+    <!-- Sorting Options -->
+    <div>
+        <a href="{{ url_for('main.product_list', sort='name') }}">Sort by Name</a> |
+        <a href="{{ url_for('main.product_list', sort='price') }}">Sort by Price</a>
+    </div>
+
+    <!-- Product List -->
+    <div>
+        {% for product in products.items %}
+            <div class="product">
+                <h2>{{ product.name }}</h2>
+                <p>Price: ${{ product.price }}</p>
+                <p>{{ product.description }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Links -->
+    <div>
+        {% if products.has_prev %}
+            <a href="{{ url_for('main.product_list', page=products.prev_num, sort=sort_by) }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ products.page }} of {{ products.pages }}</span>
+
+        {% if products.has_next %}
+            <a href="{{ url_for('main.product_list', page=products.next_num, sort=sort_by) }}">Next</a>
+        {% endif %}
+    </div>
+</body>
+</html>
