@@ -2,39 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product Listing</title>
+    <title>Home - E-commerce</title>
 </head>
 <body>
-    <h1>Products</h1>
+    <h1>Welcome to Our Store</h1>
 
-    <!-- Sorting Options -->
-    <div>
-        <a href="{{ url_for('main.product_list', sort='name') }}">Sort by Name</a> |
-        <a href="{{ url_for('main.product_list', sort='price') }}">Sort by Price</a>
-    </div>
+    <!-- Search Bar -->
+    <form action="{{ url_for('main.product_list') }}" method="GET">
+        <input type="text" name="search" placeholder="Search for products">
+        <button type="submit">Search</button>
+    </form>
 
-    <!-- Product List -->
-    <div>
-        {% for product in products.items %}
+    <!-- Featured Products Section -->
+    <h2>Featured Products</h2>
+    <div id="featured-products">
+        {% for product in featured_products %}
             <div class="product">
-                <h2>{{ product.name }}</h2>
+                <h3>{{ product.name }}</h3>
                 <p>Price: ${{ product.price }}</p>
                 <p>{{ product.description }}</p>
+                <a href="{{ url_for('main.product_detail', product_id=product.id) }}">View Details</a>
             </div>
         {% endfor %}
     </div>
 
-    <!-- Pagination Links -->
-    <div>
-        {% if products.has_prev %}
-            <a href="{{ url_for('main.product_list', page=products.prev_num, sort=sort_by) }}">Previous</a>
-        {% endif %}
-
-        <span>Page {{ products.page }} of {{ products.pages }}</span>
-
-        {% if products.has_next %}
-            <a href="{{ url_for('main.product_list', page=products.next_num, sort=sort_by) }}">Next</a>
-        {% endif %}
+    <!-- Product Categories -->
+    <h2>Product Categories</h2>
+    <div id="categories">
+        {% for category in categories %}
+            <a href="{{ url_for('main.product_list', category=category.name) }}">{{ category.name }}</a>
+        {% endfor %}
     </div>
+
 </body>
 </html>

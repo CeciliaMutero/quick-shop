@@ -18,7 +18,18 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def home():
     """Home route for the application."""
-    return "Hello, World!"
+    return render_template('home.html')
+
+@main.route('/about')
+def about():
+    """About page route for the application."""
+    return render_template('about.html')
+
+# Contact Us route
+@main.route('/contact')
+def contact():
+    """Render the Contact Us page."""
+    return render_template('contact.html')
 
 
 # Registration route
@@ -266,3 +277,14 @@ def add_to_cart_page():
 
     # Render the add-to-cart form if request method is GET
     return render_template('add_to_cart.html')
+
+@main.route('/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout():
+    if request.method == 'POST':
+        # Get shipping details from the form
+        shipping_address = request.form.get('shipping_address')
+        # Redirect to payment if all information is provided
+        return redirect(url_for('main.payment'))
+    return render_template('checkout.html')
+
