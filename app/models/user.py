@@ -20,8 +20,11 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)  # Unique email, required
     password = db.Column(db.String(512), nullable=False)  # Hashed password
 
-    # Relationship to associate users with orders
+    # Relationships
     orders = db.relationship('Order', backref='user', lazy=True)
+    cart_items = db.relationship('ShoppingCart', back_populates='user', cascade="all, delete-orphan")
+
+
 
     def __repr__(self):
         """

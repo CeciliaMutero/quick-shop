@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_migrate import Migrate
 import os
 
 
@@ -10,6 +11,7 @@ login_manager = LoginManager()
 
 # Create an instance of SQLAlchemy
 db = SQLAlchemy()
+migrate = Migrate() # Initialize Migrate
 
 def create_app():
     """
@@ -31,8 +33,9 @@ def create_app():
 
     # Connect the database to the app
     db.init_app(app)
+    migrate.init_app(app, db)  # Initialize Migrate with the app and db
 
- # Set the login view for Flask-Login
+    # Set the login view for Flask-Login
     login_manager.login_view = 'main.login'  # Define where to redirect for login
     login_manager.init_app(app)  # Initialize with the app
 
@@ -43,11 +46,20 @@ def create_app():
         from app.models.order import Order # Import order model
         from app.models.user import User # Import user model
         from app.models.orderproduct import OrderProduct # Import orderproduct model
+        from app.models.shopping_cart import ShoppingCart
         db.create_all()  # Create all database tables
     
     @login_manager.user_loader
     def load_user(user_id):
-        """Load a user from the database using the user ID."""
+        """
+        Load a user from the database using the user ID.
+
+        Args:
+            user_id (int): The ID of the user to load.
+
+        Returns:
+            User: The user instance, or None if not found.
+        """
         from .models.user import User
         return User.query.get(int(user_id))
     
