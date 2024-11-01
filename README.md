@@ -55,7 +55,7 @@ Clone the Repository:
 
 bash
 Copy code
-git clone https://github.com/CeciliaMuteroQuickShop.git
+git clone https://github.com/CeciliaMutero/quick-shop.git
 cd QuickShop
 Set up a Virtual Environment:
 
