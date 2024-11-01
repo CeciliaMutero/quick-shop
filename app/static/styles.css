@@ -1,0 +1,145 @@
+/* General resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f9f9f9; /* Light background for better contrast */
+}
+
+/* Navbar */
+header {
+    background-color: #333;
+    color: #ffffff;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem; /* Increased padding for better spacing */
+}
+
+.logo a {
+    color: #ffffff;
+    font-size: 1.8rem; /* Slightly larger logo font */
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.nav-links {
+    list-style-type: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin: 0 15px; /* Increased margin for better spacing */
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 15px; /* Increased padding for larger clickable area */
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-links a:hover {
+    background-color: #555; /* Darker hover effect */
+}
+
+/* Content */
+.content {
+    flex: 1;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #fff; /* White background for content area */
+    border-radius: 8px; /* Rounded corners for a softer look */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Cart Styles */
+.cart-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f7f7f7; /* Light background for cart items */
+}
+
+/* Buttons */
+button {
+    background-color: #007BFF; /* Primary button color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Footer */
+.footer {
+    background-color: #333;
+    color: #ffffff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.footer .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.footer-links {
+    list-style-type: none;
+    display: flex;
+    margin-top: 0.5rem;
+}
+
+.footer-links li {
+    margin: 0 10px;
+}
+
+.footer-links a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #ddd;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Stack items on smaller screens */
+        align-items: flex-start; /* Align items to the start */
+    }
+
+    .nav-links {
+        flex-direction: column; /* Stack navigation links */
+        margin-top: 10px;
+    }
+
+    .nav-links li {
+        margin: 5px 0; /* Adjust margin for stacked links */
+    }
+
+    .content {
+        width: 95%; /* Reduce width for smaller screens */
+    }
+}

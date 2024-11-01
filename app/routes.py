@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from app.forms import RegistrationForm, LoginForm
+from app.forms import RegistrationForm, LoginForm, AddToCartForm
 from app.models.user import User
 from app.models.product import Product
 from app.models.order import Order
@@ -18,7 +18,10 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def home():
     """Home route for the application."""
-    return render_template('home.html')
+    # Fetch all products without filtering by 'is_featured'
+    products = Product.query.limit(5).all()  # Adjust limit as needed
+    return render_template('home.html', products=products)
+
 
 @main.route('/about')
 def about():
@@ -101,45 +104,76 @@ def logout():
 # Products route - list all products
 @main.route('/products')
 def product_list():
-    """
-    Route to display a list of products.
-    Supports sorting by name or price, with pagination.
-
-    Returns:
-        Rendered product list template with sorted and paginated product data.
-    """
-    # Get sorting parameter from query string
-    sort_by = request.args.get('sort', 'name')  # Default to 'name' if no sort is provided
-
-    # Apply sorting based on sort_by parameter
-    if sort_by == 'name':
-        products_query = Product.query.order_by(Product.name.asc())
-    elif sort_by == 'price':
-        products_query = Product.query.order_by(Product.price.asc())
-    else:
-        products_query = Product.query  # Default query if no valid sort option
-
-    # Pagination
+    sort_by = request.args.get('sort', 'name')
+    search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
-    products = products_query.paginate(page=page, per_page=10)
 
-    return render_template('product_list.html', products=products, sort_by=sort_by)
+    # Filtering products based on search query
+    products_query = Product.query
+    if search_query:
+        products_query = products_query.filter(Product.name.ilike(f'%{search_query}%'))
+
+    # Sorting products
+    if sort_by == 'name':
+        products_query = products_query.order_by(Product.name.asc())
+    elif sort_by == 'price':
+        products_query = products_query.order_by(Product.price.asc())
+    else:
+        products_query = products_query
+
+    # Paginate results
+    products = products_query.paginate(page=page, per_page=10)
+    return render_template('product_list.html', products=products, sort_by=sort_by, search_query=search_query)
 
 
 # Product detail route - view details of a specific product
-@main.route('/products/<int:product_id>')
+from flask import render_template, request
+from .forms import AddToCartForm  # Adjust this import based on your structure
+from app.models.product import Product  # Import your Product model
+
+@main.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
     """
-    Route to display details for a specific product.
+    Render the product detail page for a specific product and handle
+    the addition of the product to the shopping cart.
 
-    Args:
-        product_id (int): The ID of the product to display.
+    Parameters:
+    product_id (int): The ID of the product to display.
 
     Returns:
-        Rendered product detail template for the specified product.
+    render_template: Renders the 'product_detail.html' template
+    with the product information and the add-to-cart form. If the
+    form is submitted and valid, it adds the product to the cart.
+
+    This route handles both GET and POST requests. On a GET request,
+    it displays the product details along with a form for adding
+    the product to the cart. On a POST request, it processes the form
+    submission to add the specified quantity of the product to the cart.
     """
-    product = Product.query.get_or_404(product_id)  # Retrieve a single product by ID or 404 if not found
-    return render_template('product_detail.html', product=product)
+    
+    product = Product.query.get_or_404(product_id)  # Fetch the product or return a 404 if not found
+    form = AddToCartForm()  # Create an instance of your form
+    
+    if form.validate_on_submit():
+        # Handle the form submission, e.g., add the product to the cart
+        product_id = form.product_id.data
+        quantity = form.quantity.data
+        # Add logic to add the product to the cart
+        # Redirect or render a success message, etc.
+
+    return render_template('product_detail.html', product=product, form=form)  # Pass the form to the template
+
+
+@main.route('/products/search', methods=['GET'])
+def search_products():
+    query = request.args.get('query', '')
+    products = Product.query.filter(Product.name.ilike(f"%{query}%")).all()
+    return render_template('product_list.html', products=products, query=query)
+
+@main.route('/products/category/<int:category_id>')
+def products_by_category(category_id):
+    products = Product.query.filter_by(category_id=category_id).all()
+    return render_template('product_list.html', products=products)
 
 
 # Orders route
@@ -278,6 +312,36 @@ def add_to_cart_page():
     # Render the add-to-cart form if request method is GET
     return render_template('add_to_cart.html')
 
+@main.route('/cart/update/<int:item_id>', methods=['POST'])
+@login_required
+def update_cart(item_id):
+    """
+    Route to update the quantity of an item in the shopping cart.
+
+    Parameters:
+    item_id (int): The ID of the shopping cart item to update.
+
+    Returns:
+    Redirect to the cart view with success or error message.
+    """
+    quantity = request.form.get('quantity', type=int)
+
+    # Find the cart item by the item_id
+    cart_item = ShoppingCart.query.filter_by(user_id=current_user.id, id=item_id).first()
+
+    if cart_item:
+        if quantity is not None and quantity > 0:
+            cart_item.quantity = quantity  # Update the quantity
+            db.session.commit()
+            flash('Cart updated successfully!', 'success')
+        else:
+            flash('Invalid quantity. Please enter a valid number.', 'danger')
+    else:
+        flash('Item not found in cart.', 'danger')
+
+    return redirect(url_for('main.view_cart'))  # Redirect back to the cart view
+
+
 @main.route('/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout():
@@ -287,4 +351,3 @@ def checkout():
         # Redirect to payment if all information is provided
         return redirect(url_for('main.payment'))
     return render_template('checkout.html')
-

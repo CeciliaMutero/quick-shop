@@ -6,12 +6,11 @@ from flask_admin.contrib.sqla import ModelView
 from flask_migrate import Migrate
 import os
 
-
 login_manager = LoginManager()
 
 # Create an instance of SQLAlchemy
 db = SQLAlchemy()
-migrate = Migrate() # Initialize Migrate
+migrate = Migrate()  # Initialize Migrate
 
 def create_app():
     """
@@ -39,16 +38,15 @@ def create_app():
     login_manager.login_view = 'main.login'  # Define where to redirect for login
     login_manager.init_app(app)  # Initialize with the app
 
-
     # Import and register models
     with app.app_context():
         from app.models.product import Product  # Import product model
-        from app.models.order import Order # Import order model
-        from app.models.user import User # Import user model
-        from app.models.orderproduct import OrderProduct # Import orderproduct model
+        from app.models.order import Order  # Import order model
+        from app.models.user import User  # Import user model
+        from app.models.orderproduct import OrderProduct  # Import orderproduct model
         from app.models.shopping_cart import ShoppingCart
         db.create_all()  # Create all database tables
-    
+
     @login_manager.user_loader
     def load_user(user_id):
         """
@@ -62,11 +60,11 @@ def create_app():
         """
         from .models.user import User
         return User.query.get(int(user_id))
-    
+
     # Initialize Flask-Admin
     admin = Admin(app, name='Admin Panel', template_mode='bootstrap3')
     admin.add_view(ModelView(Product, db.session))  # Add Product model to admin
-    
+
     # Import and register the Blueprints
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)

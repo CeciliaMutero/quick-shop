@@ -8,8 +8,11 @@
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="{{ url_for('main.home') }}">QuickShop</a>
+            </div>
+            <ul class="nav-links">
                 <li><a href="{{ url_for('main.home') }}">Home</a></li>
                 <li><a href="{{ url_for('main.login') }}">Login</a></li>
                 <li><a href="{{ url_for('main.register') }}">Register</a></li>
@@ -19,15 +22,15 @@
         </nav>
     </header>
 
-    <div class="content">
+    <main class="content">
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 
-    <footer>
+    <footer class="footer">
         <div class="container">
             <p>&copy; 2024 QuickShop. All rights reserved.</p>
-            <ul>
+            <ul class="footer-links">
                 <li><a href="{{ url_for('main.about') }}">About Us</a></li>
                 <li><a href="{{ url_for('main.contact') }}">Contact Us</a></li>
             </ul>

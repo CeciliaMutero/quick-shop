@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField, FloatField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, IntegerField, HiddenField, FloatField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 class RegistrationForm(FlaskForm):
@@ -15,3 +15,8 @@ class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class AddToCartForm(FlaskForm):
+    product_id = HiddenField('Product ID', validators=[DataRequired()])
+    quantity = IntegerField('Quantity', default=1, validators=[DataRequired()])
+    submit = SubmitField('Add to Cart')

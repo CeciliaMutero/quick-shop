@@ -1,5 +1,5 @@
 from app import db
-from app.models.orderproduct import OrderProduct
+from app.models.orderproduct import OrderProduct  # Ensure OrderProduct model is correctly defined
 
 class Product(db.Model):
     """
@@ -12,8 +12,11 @@ class Product(db.Model):
         price (float): The price of the product.
         stock (int): Quantity available in stock.
     """
-   # table name for the Product model
+
+    # Table name for the Product model
     __tablename__ = 'products'
+
+    # Column definitions
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     name = db.Column(db.String(100), nullable=False)  # Product name, required
     description = db.Column(db.Text, nullable=True)  # Optional product description
@@ -21,9 +24,9 @@ class Product(db.Model):
     stock = db.Column(db.Integer, nullable=False, default=0)  # Quantity in stock
 
     # Relationships
-    orders = db.relationship('OrderProduct', backref='product', lazy=True)
-    cart_items = db.relationship('ShoppingCart', back_populates='product', cascade="all, delete-orphan")
-    
+    orders = db.relationship('OrderProduct', backref='product', lazy=True)  # Ensure OrderProduct is defined properly
+    cart_items = db.relationship('ShoppingCart', back_populates='product', cascade="all, delete-orphan")  # Ensure ShoppingCart is defined properly
+
     def __repr__(self):
         """
         Returns a string representation of the Product instance.
